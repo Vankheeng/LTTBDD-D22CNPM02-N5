@@ -15,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -207,5 +208,18 @@ public class MainActivity extends AppCompatActivity {
             locVaHienThi();
             capNhatDashboard();
         }
+    }
+
+    private void locVaHienThi() {
+        List<Phong> ketQua = controller.timKiem(tuKhoaHienTai, loaiLocHienTai);
+        adapter.capNhatDanhSach(ketQua);
+    }
+
+    private void capNhatDashboard() {
+        NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+        tvTongPhong.setText(String.valueOf(controller.getDanhSachPhong().size()));
+        tvPhongTrong.setText(String.valueOf(controller.getSoPhongTrong()));
+        tvPhongDaThue.setText(String.valueOf(controller.getSoPhongDaThue()));
+        tvDoanhThu.setText(fmt.format(controller.getDoanhThuDuKien()) + " đ");
     }
 }

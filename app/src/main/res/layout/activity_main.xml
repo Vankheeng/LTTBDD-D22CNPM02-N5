@@ -24,6 +24,153 @@
             android:textStyle="bold"/>
     </LinearLayout>
 
+
+    <!-- Dashboard -->
+    <LinearLayout
+        android:id="@+id/layoutDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1976D2"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp">
+
+        <!-- Hàng 1: Tổng / Trống / Đã thuê -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:cardCornerRadius="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView android:id="@+id/tvTongPhong"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="22sp" android:textStyle="bold"
+                        android:textColor="#1976D2"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Tổng phòng" android:textSize="11sp" android:textColor="#757575"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:cardCornerRadius="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView android:id="@+id/tvPhongTrong"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="22sp" android:textStyle="bold"
+                        android:textColor="#4CAF50"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Còn trống" android:textSize="11sp" android:textColor="#757575"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:cardCornerRadius="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView android:id="@+id/tvPhongDaThue"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="22sp" android:textStyle="bold"
+                        android:textColor="#F44336"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Đã thuê" android:textSize="11sp" android:textColor="#757575"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- Hàng 2: Doanh thu -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardCornerRadius="8dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="10dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="💰 Doanh thu dự kiến tháng này"
+                    android:textSize="13sp" android:textColor="#757575"/>
+                <TextView android:id="@+id/tvDoanhThu"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="0 đ" android:textSize="15sp" android:textStyle="bold"
+                    android:textColor="#1976D2"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- SearchView -->
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:queryHint="Tìm theo tên phòng, người thuê..."
+        android:iconifiedByDefault="false"
+        android:elevation="2dp"/>
+
+    <!-- Nút lọc -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp">
+
+        <Button android:id="@+id/btnLocTatCa"
+            android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1"
+            android:text="Tất cả" android:textSize="12sp"
+            android:layout_marginEnd="4dp"/>
+
+        <Button android:id="@+id/btnLocTrong"
+            android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1"
+            android:text="Còn trống" android:textSize="12sp"
+            android:backgroundTint="#4CAF50" android:textColor="@android:color/white"
+            android:layout_marginEnd="4dp"/>
+
+        <Button android:id="@+id/btnLocDaThue"
+            android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1"
+            android:text="Đã thuê" android:textSize="12sp"
+            android:backgroundTint="#F44336" android:textColor="@android:color/white"/>
+    </LinearLayout>
+
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

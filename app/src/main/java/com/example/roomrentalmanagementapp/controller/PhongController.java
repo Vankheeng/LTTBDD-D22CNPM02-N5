@@ -29,4 +29,40 @@ public class PhongController {
         return true;
     }
 
+    public List<Phong> timKiem(String tuKhoa, int loaiLoc) {
+        // loaiLoc: 0 = tất cả, 1 = còn trống, 2 = đã thuê
+        List<Phong> ketQua = new ArrayList<>();
+        String kw = tuKhoa.toLowerCase().trim();
+        for (Phong p : danhSachPhong) {
+            boolean khopTuKhoa = kw.isEmpty()
+                    || p.getTenPhong().toLowerCase().contains(kw)
+                    || p.getMaPhong().toLowerCase().contains(kw)
+                    || p.getTenNguoiThue().toLowerCase().contains(kw);
+            boolean khopLoc = (loaiLoc == 0)
+                    || (loaiLoc == 1 && !p.isDaThue())
+                    || (loaiLoc == 2 && p.isDaThue());
+            if (khopTuKhoa && khopLoc) ketQua.add(p);
+        }
+        return ketQua;
+    }
+
+    // === TÍNH NĂNG MỚI: Thống kê ===
+    public int getSoPhongTrong() {
+        int count = 0;
+        for (Phong p : danhSachPhong) if (!p.isDaThue()) count++;
+        return count;
+    }
+
+    public int getSoPhongDaThue() {
+        int count = 0;
+        for (Phong p : danhSachPhong) if (p.isDaThue()) count++;
+        return count;
+    }
+
+    public double getDoanhThuDuKien() {
+        double total = 0;
+        for (Phong p : danhSachPhong) if (p.isDaThue()) total += p.getGiaThue();
+        return total;
+    }
+
 }
