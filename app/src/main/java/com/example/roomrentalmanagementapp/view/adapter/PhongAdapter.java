@@ -1,111 +1,107 @@
 package com.example.roomrentalmanagementapp.view.adapter;
 
-
-import android.os.Bundle;
+import android.graphics.Color;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.roomrentalmanagementapp.R;
 import com.example.roomrentalmanagementapp.model.Phong;
 
-public class AddEditPhongActivity extends AppCompatActivity {
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-    private EditText etMaPhong, etTenPhong, etGiaThue, etTenNguoiThue, etSoDienThoai;
-    private RadioGroup rgTrangThai;
-    private RadioButton rbDaThue;
-    private LinearLayout layoutNguoiThue;
-    private Button btnLuu;
+public class PhongAdapter extends RecyclerView.Adapter<PhongAdapter.PhongViewHolder> {
 
-    private int viTri = -1; // -1 = thêm mới
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_edit_phong);
-
-        etMaPhong = findViewById(R.id.etMaPhong);
-        etTenPhong = findViewById(R.id.etTenPhong);
-        etGiaThue = findViewById(R.id.etGiaThue);
-        etTenNguoiThue = findViewById(R.id.etTenNguoiThue);
-        etSoDienThoai = findViewById(R.id.etSoDienThoai);
-        rgTrangThai = findViewById(R.id.rgTrangThai);
-        rbDaThue = findViewById(R.id.rbDaThue);
-        layoutNguoiThue = findViewById(R.id.layoutNguoiThue);
-        btnLuu = findViewById(R.id.btnLuu);
-        Button btnHuy = findViewById(R.id.btnHuy);
-        btnHuy.setOnClickListener(v -> finish());
-
-        // Hiện/ẩn form người thuê
-        rgTrangThai.setOnCheckedChangeListener((group, checkedId) -> {
-            layoutNguoiThue.setVisibility(
-                    checkedId == R.id.rbDaThue ? View.VISIBLE : View.GONE
-            );
-        });
-
-        viTri = getIntent().getIntExtra(MainActivity.EXTRA_POSITION, -1);
-
-        if (viTri >= 0) {
-            // Chế độ sửa
-            setTitle("Sửa Phòng");
-            Phong p = MainActivity.controller.getDanhSachPhong().get(viTri);
-            etMaPhong.setText(p.getMaPhong());
-            etTenPhong.setText(p.getTenPhong());
-            etGiaThue.setText(String.valueOf(p.getGiaThue()));
-            if (p.isDaThue()) {
-                rbDaThue.setChecked(true);
-                layoutNguoiThue.setVisibility(View.VISIBLE);
-                etTenNguoiThue.setText(p.getTenNguoiThue());
-                etSoDienThoai.setText(p.getSoDienThoai());
-            }
-        } else {
-            setTitle("Thêm Phòng Mới");
-        }
-
-        btnLuu.setOnClickListener(v -> luuPhong());
+    public interface OnPhongClickListener {
+        void onItemClick(int position);
+        void onDeleteClick(int position);
+        void onTinhTienClick(int position);
     }
 
-    private void luuPhong() {
-        String ma = etMaPhong.getText().toString().trim();
-        String ten = etTenPhong.getText().toString().trim();
-        String giaStr = etGiaThue.getText().toString().trim();
+    private List<Phong> danhSachGoc;
+    private List<Phong> danhSachHienThi; // filtered list
+    private OnPhongClickListener listener;
 
-        // Validate
-        if (ma.isEmpty()) { etMaPhong.setError("Vui lòng nhập mã phòng"); return; }
-        if (ten.isEmpty()) { etTenPhong.setError("Vui lòng nhập tên phòng"); return; }
-        if (giaStr.isEmpty()) { etGiaThue.setError("Vui lòng nhập giá thuê"); return; }
+    public PhongAdapter(List<Phong> danhSach, OnPhongClickListener listener) {
+        this.danhSachGoc = danhSach;
+        this.danhSachHienThi = new ArrayList<>(danhSach);
+        this.listener = listener;
+    }
 
-        double gia;
-        try {
-            gia = Double.parseDouble(giaStr);
-            if (gia <= 0) { etGiaThue.setError("Giá phải > 0"); return; }
-        } catch (NumberFormatException e) {
-            etGiaThue.setError("Giá không hợp lệ"); return;
-        }
+    public void capNhatDanhSach(List<Phong> danhSachMoi) {
+        this.danhSachHienThi = new ArrayList<>(danhSachMoi);
+        notifyDataSetChanged();
+    }
 
-        // Kiểm tra mã trùng
-        if (!MainActivity.controller.kiemTraMaPhong(ma, viTri)) {
-            etMaPhong.setError("Mã phòng đã tồn tại"); return;
-        }
+    public Phong getPhongTaiViTri(int position) {
+        return danhSachHienThi.get(position);
+    }
 
-        boolean daThue = rbDaThue.isChecked();
-        String tenNguoiThue = "", sdt = "";
-        if (daThue) {
-            tenNguoiThue = etTenNguoiThue.getText().toString().trim();
-            sdt = etSoDienThoai.getText().toString().trim();
-            if (tenNguoiThue.isEmpty()) { etTenNguoiThue.setError("Nhập tên người thuê"); return; }
-            if (sdt.isEmpty()) { etSoDienThoai.setError("Nhập số điện thoại"); return; }
-        }
+    // Tìm vị trí thật trong danh sách gốc
+    public int getViTriGoc(int position) {
+        Phong p = danhSachHienThi.get(position);
+        return danhSachGoc.indexOf(p);
+    }
 
-        Phong phong = new Phong(ma, ten, gia, daThue, tenNguoiThue, sdt);
+    @NonNull
+    @Override
+    public PhongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_phong, parent, false);
+        return new PhongViewHolder(v);
+    }
 
-        if (viTri >= 0) {
-            MainActivity.controller.suaPhong(viTri, phong);
-            Toast.makeText(this, "Đã cập nhật phòng!", Toast.LENGTH_SHORT).show();
+    @Override
+    public void onBindViewHolder(@NonNull PhongViewHolder holder, int position) {
+        Phong p = danhSachHienThi.get(position);
+        NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+
+        holder.tvTenPhong.setText(p.getTenPhong() + " (" + p.getMaPhong() + ")");
+        holder.tvGiaThue.setText(fmt.format(p.getGiaThue()) + " đ/tháng");
+
+        if (p.isDaThue()) {
+            holder.tvTrangThai.setText("Đã thuê - " + p.getTenNguoiThue());
+            holder.tvTrangThai.setTextColor(Color.parseColor("#F44336"));
+            holder.viewTrangThai.setBackgroundColor(Color.parseColor("#F44336"));
+            holder.btnTinhTien.setVisibility(View.VISIBLE);
         } else {
-            MainActivity.controller.themPhong(phong);
-            Toast.makeText(this, "Đã thêm phòng mới!", Toast.LENGTH_SHORT).show();
+            holder.tvTrangThai.setText("Còn trống");
+            holder.tvTrangThai.setTextColor(Color.parseColor("#4CAF50"));
+            holder.viewTrangThai.setBackgroundColor(Color.parseColor("#4CAF50"));
+            holder.btnTinhTien.setVisibility(View.GONE); // Ẩn nút nếu phòng trống
         }
 
-        setResult(RESULT_OK);
-        finish();
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(getViTriGoc(holder.getAdapterPosition())));
+        holder.btnXoa.setOnClickListener(v -> listener.onDeleteClick(getViTriGoc(holder.getAdapterPosition())));
+        holder.btnTinhTien.setOnClickListener(v -> listener.onTinhTienClick(holder.getAdapterPosition()));
+    }
+
+    @Override
+    public int getItemCount() { return danhSachHienThi.size(); }
+
+    static class PhongViewHolder extends RecyclerView.ViewHolder {
+        TextView tvTenPhong, tvGiaThue, tvTrangThai;
+        View viewTrangThai;
+        ImageButton btnXoa;
+        Button btnTinhTien;
+
+        PhongViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvTenPhong = itemView.findViewById(R.id.tvTenPhong);
+            tvGiaThue = itemView.findViewById(R.id.tvGiaThue);
+            tvTrangThai = itemView.findViewById(R.id.tvTrangThai);
+            viewTrangThai = itemView.findViewById(R.id.viewTrangThai);
+            btnXoa = itemView.findViewById(R.id.btnXoa);
+            btnTinhTien = itemView.findViewById(R.id.btnTinhTien);
+        }
     }
 }
