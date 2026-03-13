@@ -1,5 +1,4 @@
-package com.example.roomrentalmanagementapp.view.adapter;
-
+package com.example.roomrentalmanagementapp;
 
 import android.os.Bundle;
 import android.view.View;
