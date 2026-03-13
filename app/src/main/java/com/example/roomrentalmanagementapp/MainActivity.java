@@ -110,6 +110,104 @@ public class MainActivity extends AppCompatActivity {
         capNhatDashboard();
         locVaHienThi();
     }
+    private void hienDialogTinhTien(int position) {
+        Phong p = adapter.getPhongTaiViTri(position);
+        NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+
+        // Layout dialog nhập chỉ số điện
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(48, 24, 48, 24);
+
+        TextView tvInfo = new TextView(this);
+        tvInfo.setText("Phòng: " + p.getTenPhong() + "\nNgười thuê: " + p.getTenNguoiThue());
+        tvInfo.setPadding(0, 0, 0, 16);
+        layout.addView(tvInfo);
+
+        EditText etCu = new EditText(this);
+        etCu.setHint("Chỉ số điện cũ (kWh)");
+        etCu.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        etCu.setText(String.valueOf((int) p.getChiSoDienCu()));
+        layout.addView(etCu);
+
+        EditText etMoi = new EditText(this);
+        etMoi.setHint("Chỉ số điện mới (kWh)");
+        etMoi.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        etMoi.setText(String.valueOf((int) p.getChiSoDienMoi()));
+        layout.addView(etMoi);
+
+        new AlertDialog.Builder(this)
+                .setTitle("💰 Tính tiền phòng")
+                .setView(layout)
+                .setPositiveButton("Tính", (dialog, which) -> {
+                    try {
+                        double cu = Double.parseDouble(etCu.getText().toString());
+                        double moi = Double.parseDouble(etMoi.getText().toString());
+                        if (moi < cu) {
+                            Toast.makeText(this, "Chỉ số mới phải lớn hơn cũ!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        p.setChiSoDienCu(cu);
+                        p.setChiSoDienMoi(moi);
+
+                        double tienDien = p.tinhTienDien();
+                        double tongTien = p.tinhTongTienThang();
+
+                        // Hiện kết quả + nút gửi SMS
+                        String thongBao = "🏠 Tiền phòng: " + fmt.format(p.getGiaThue()) + " đ\n"
+                                + "⚡ Tiền điện: " + fmt.format(tienDien) + " đ\n"
+                                + "   (" + (int)(moi-cu) + " kWh × " + fmt.format(Phong.getDonGiaDien()) + " đ)\n"
+                                + "━━━━━━━━━━━━\n"
+                                + "💰 TỔNG: " + fmt.format(tongTien) + " đ";
+
+                        new AlertDialog.Builder(this)
+                                .setTitle("Hóa đơn - " + p.getTenPhong())
+                                .setMessage(thongBao)
+                                .setPositiveButton("📱 Gửi SMS", (d2, w2) -> {
+                                    guiSMS(p.getSoDienThoai(), thongBao);
+                                })
+                                .setNeutralButton("📞 Zalo", (d2, w2) -> {
+                                    moZalo(p.getSoDienThoai());
+                                })
+                                .setNegativeButton("Đóng", null)
+                                .show();
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(this, "Vui lòng nhập đúng chỉ số điện!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void guiSMS(String sdt, String noiDung) {
+        try {
+            Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+            smsIntent.setData(Uri.parse("smsto:" + sdt));
+            smsIntent.putExtra("sms_body", noiDung);
+            startActivity(smsIntent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Không thể mở ứng dụng SMS!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void moZalo(String sdt) {
+        try {
+            Intent zaloIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://zalo.me/" + sdt));
+            startActivity(zaloIntent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Không thể mở Zalo!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            locVaHienThi();
+            capNhatDashboard();
+        }
+    }
 
     private void locVaHienThi() {
         List<Phong> ketQua = controller.timKiem(tuKhoaHienTai, loaiLocHienTai);
