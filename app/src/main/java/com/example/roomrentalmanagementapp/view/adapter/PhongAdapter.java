@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.roomrentalmanagementapp.model.Phong;
 
+import com.example.roomrentalmanagementapp.MainActivity;
+import com.example.roomrentalmanagementapp.model.Phong;
+import com.example.roomrentalmanagementapp.R;
 public class AddEditPhongActivity extends AppCompatActivity {
 
     private EditText etMaPhong, etTenPhong, etGiaThue, etTenNguoiThue, etSoDienThoai;
