@@ -208,4 +208,17 @@ public class MainActivity extends AppCompatActivity {
             capNhatDashboard();
         }
     }
+
+    private void locVaHienThi() {
+        List<Phong> ketQua = controller.timKiem(tuKhoaHienTai, loaiLocHienTai);
+        adapter.capNhatDanhSach(ketQua);
+    }
+
+    private void capNhatDashboard() {
+        NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+        tvTongPhong.setText(String.valueOf(controller.getDanhSachPhong().size()));
+        tvPhongTrong.setText(String.valueOf(controller.getSoPhongTrong()));
+        tvPhongDaThue.setText(String.valueOf(controller.getSoPhongDaThue()));
+        tvDoanhThu.setText(fmt.format(controller.getDoanhThuDuKien()) + " đ");
+    }
 }
